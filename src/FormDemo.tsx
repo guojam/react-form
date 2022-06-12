@@ -1,5 +1,5 @@
 import React, { Component, FormEvent } from 'react';
-import { Form } from './form';
+import { Form, FormField, FormStore } from './form';
 import Input from './input';
 
 interface IState {
@@ -8,6 +8,7 @@ interface IState {
 
 export default class FormDemo extends Component<any, IState> {
     private initialState;
+    private formStore;
     constructor(props: any) {
         super(props);
         this.state = {
@@ -15,6 +16,10 @@ export default class FormDemo extends Component<any, IState> {
             password: '',
         };
         this.initialState = { ...this.state };
+        this.formStore = new FormStore({
+            username: [''],
+            password: [''],
+        });
     }
     handleSubmit = (e: FormEvent) => {
         e.preventDefault();
@@ -32,29 +37,16 @@ export default class FormDemo extends Component<any, IState> {
         const { username, password } = this.state;
         return (
             <>
-                {' '}
-                <Form onSubmit={this.handleSubmit}>
-                    <div className="ui-form-item">
-                        <label className="ui-label">用户名</label>
-                        <div className="ui-form-item-box">
-                            <Input
-                                name="username"
-                                value={username}
-                                onChange={this.handleChange('username')}
-                            />
-                        </div>
-                    </div>
-                    <div className="ui-form-item">
-                        <label className="ui-label">密码</label>
-                        <div className="ui-form-item-box">
-                            <Input
-                                type="password"
-                                name="password"
-                                value={password}
-                                onChange={this.handleChange('password')}
-                            />
-                        </div>
-                    </div>
+                <Form store={this.formStore} onSubmit={this.handleSubmit}>
+                    <FormField name="username" label="用户名">
+                        <Input onChange={this.handleChange('username')} />
+                    </FormField>
+                    <FormField name="password" label="密码">
+                        <Input
+                            type="password"
+                            onChange={this.handleChange('password')}
+                        />
+                    </FormField>
                     <div className="ui-form-item">
                         <input type="submit" value="提交" />
                         <input
@@ -66,7 +58,7 @@ export default class FormDemo extends Component<any, IState> {
                 </Form>
                 <dl>
                     <dt>表单值</dt>
-                    {Object.keys(this.state).map((key) => (
+                    {Object.keys(this.formStore.get()).map((key) => (
                         <dd key={key}>
                             {key}:{this.state[key]}
                         </dd>
