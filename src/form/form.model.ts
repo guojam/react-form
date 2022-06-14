@@ -1,1 +1,1 @@
-export interface FormStoreProps {}
+export type FormListener = (name: string) => void;

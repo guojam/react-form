@@ -1,0 +1,17 @@
+.ui-form-item {
+    display: flex;
+    align-items: center;
+    & + .ui-form-item {
+        margin-top: 15px;
+    }
+}
+.ui-label {
+    width: 100px;
+    margin-right: 10px;
+}
+.ui-form-item-box {
+    flex: 1;
+    input + input {
+        margin-left: 10px;
+    }
+}

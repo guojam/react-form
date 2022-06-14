@@ -1,8 +1,15 @@
 import React from 'react';
+import FormStore from './FormStore';
+import FormStoreContext from './FormStoreContext';
 
-export const FormStoreContext = React.createContext(undefined);
+interface FormProps {
+    store: FormStore;
+    className?: string;
+    children?: React.ReactNode;
+    onSubmit?: (e: React.FormEvent) => void;
+}
 
-function Form(props: any) {
+function Form(props: FormProps) {
     const { store, children, onSubmit } = props;
 
     return (

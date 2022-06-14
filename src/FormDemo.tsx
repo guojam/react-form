@@ -7,63 +7,54 @@ interface IState {
 }
 
 export default class FormDemo extends Component<any, IState> {
-    private initialState;
     private formStore;
     constructor(props: any) {
         super(props);
-        this.state = {
-            username: '',
-            password: '',
-        };
-        this.initialState = { ...this.state };
         this.formStore = new FormStore({
             username: [''],
             password: [''],
         });
     }
     handleSubmit = (e: FormEvent) => {
+        const formValues = this.formStore.get();
+        console.log('formValues:', formValues);
         e.preventDefault();
     };
     handleReset = () => {
-        this.setState({ ...this.initialState });
+        this.formStore.reset();
     };
     handleChange = (fieldName: string) => {
         return (value: string) => {
-            console.log(fieldName);
-            this.setState({ [fieldName]: value });
+            console.log(fieldName, 'changed:', value);
         };
     };
     render() {
-        const { username, password } = this.state;
         return (
             <>
                 <Form store={this.formStore} onSubmit={this.handleSubmit}>
-                    <FormField name="username" label="用户名">
-                        <Input onChange={this.handleChange('username')} />
+                    <FormField
+                        name="username"
+                        label="用户名"
+                        onChange={this.handleChange('username')}
+                    >
+                        <Input />
                     </FormField>
-                    <FormField name="password" label="密码">
-                        <Input
-                            type="password"
-                            onChange={this.handleChange('password')}
-                        />
+                    <FormField
+                        name="password"
+                        label="密码"
+                        onChange={this.handleChange('password')}
+                    >
+                        <Input type="password" />
                     </FormField>
-                    <div className="ui-form-item">
+                    <FormField label="">
                         <input type="submit" value="提交" />
                         <input
                             type="button"
                             value="重置"
                             onClick={this.handleReset}
                         />
-                    </div>
+                    </FormField>
                 </Form>
-                <dl>
-                    <dt>表单值</dt>
-                    {Object.keys(this.formStore.get()).map((key) => (
-                        <dd key={key}>
-                            {key}:{this.state[key]}
-                        </dd>
-                    ))}
-                </dl>
             </>
         );
     }
