@@ -41,7 +41,8 @@ function FormField(props: FormFieldProps) {
         return store.subscribe((n) => {
             // 当前name的数据发生了变动，获取数据并重新渲染
             if (n === name || n === '*') {
-                setValue(store.get(name));
+                const newValue = store.get(name);
+                setValue(newValue);
             }
         });
     }, [name, store]);
@@ -50,7 +51,7 @@ function FormField(props: FormFieldProps) {
 
     // FormField如果有设置name，接管子组件的双向数据流
     if (name && store && isValidElement(child)) {
-        const childProps = { value, onChange };
+        const childProps = { name, value, onChange };
         child = cloneElement(child, childProps);
     }
 

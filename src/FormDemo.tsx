@@ -1,6 +1,7 @@
 import React, { Component, FormEvent } from 'react';
 import { Form, FormField, FormStore } from './form';
-import Input from './input';
+import Input from './components/input';
+import { Radio, RadioGroup } from './components/radio';
 
 interface IState {
     [key: string]: string;
@@ -13,6 +14,7 @@ export default class FormDemo extends Component<any, IState> {
         this.formStore = new FormStore({
             username: [''],
             password: [''],
+            gender: [''],
         });
     }
     handleSubmit = (e: FormEvent) => {
@@ -45,6 +47,15 @@ export default class FormDemo extends Component<any, IState> {
                         onChange={this.handleChange('password')}
                     >
                         <Input type="password" />
+                    </FormField>
+                    <FormField name="gender" label="性别">
+                        <RadioGroup>
+                            <Radio value="male">男</Radio>
+                            <Radio value="female">女</Radio>
+                            <Radio value="other" disabled>
+                                其他
+                            </Radio>
+                        </RadioGroup>
                     </FormField>
                     <FormField label="">
                         <input type="submit" value="提交" />

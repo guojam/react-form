@@ -7,8 +7,11 @@ export function deepGet(obj: any, path: string) {
     const length = parts.length;
 
     for (let i = 0; i < length; i++) {
-        if (!isObject(obj)) return undefined;
-        obj = obj[parts[i]];
+        if (!isObject(obj)) {
+            return undefined;
+        }
+        const key = parts[i];
+        obj = obj[key];
     }
 
     return obj;
