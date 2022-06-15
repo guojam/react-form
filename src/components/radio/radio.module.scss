@@ -1,0 +1,43 @@
+.radioGroup {
+    display: inline-block;
+}
+
+.radioItem {
+    display: none;
+    // 未选中
+    + label {
+        display: inline-block;
+        padding: 0 0 0 24px;
+        height: 18px;
+        line-height: 18px;
+        overflow: hidden;
+        vertical-align: middle;
+        background: url(./radio.png) no-repeat 0 0;
+        background-size: 18px;
+        // 点按时
+        &:active {
+            background-position: 0 -20px;
+        }
+        // 下一个radio label
+        ~ label {
+            margin-left: 8px;
+        }
+    }
+    // 选中
+    &:checked + label {
+        background-position: 0 -40px;
+    }
+    // 禁用
+    &:disabled + label {
+        background-position: 0 -60px;
+        color: #999;
+    }
+    // 选中并禁用
+    &:checked:disabled + label {
+        background-position: 0 -80px;
+    }
+    // 聚焦时
+    &:focus + label {
+        box-shadow: 0 0 3px 3px #09c;
+    }
+}
