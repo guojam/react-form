@@ -1,6 +1,6 @@
 .ui-form-item {
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     & + .ui-form-item {
         margin-top: 15px;
     }
@@ -13,5 +13,8 @@
     flex: 1;
     input + input {
         margin-left: 10px;
+    }
+    p {
+        margin: 5px 0 0;
     }
 }

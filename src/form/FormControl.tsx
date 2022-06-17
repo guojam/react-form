@@ -1,5 +1,4 @@
 import React, {
-    ChangeEvent,
     cloneElement,
     isValidElement,
     useCallback,
@@ -8,17 +7,15 @@ import React, {
     useState,
 } from 'react';
 import FormStoreContext from './FormStoreContext';
-import styles from './form.module.scss';
 
-interface FormFieldProps {
-    label?: string;
+interface FormControlProps {
     name?: string;
     children?: React.ReactNode;
     onChange?: (value: string) => void;
 }
 
-function FormField(props: FormFieldProps) {
-    const { label, name, children, onChange: onFieldChange } = props;
+function FormControl(props: FormControlProps) {
+    const { name, children, onChange: onFieldChange } = props;
     const store = useContext(FormStoreContext);
 
     // 组件内部状态，用于触发组件的重新渲染
@@ -30,6 +27,7 @@ function FormField(props: FormFieldProps) {
     const onChange = useCallback(
         (newValue: string) => {
             name && store && store.set(name, newValue);
+            console.log('field', name, 'changed:', newValue);
             onFieldChange && onFieldChange(newValue);
         },
         [name, store, onFieldChange]
@@ -49,19 +47,17 @@ function FormField(props: FormFieldProps) {
 
     let child = children;
 
-    // FormField如果有设置name，接管子组件的双向数据流
-    if (name && store && isValidElement(child)) {
-        const childProps = { name, value, onChange };
-        child = cloneElement(child, childProps);
+    const childCount = React.Children.count(child);
+    if (childCount === 1) {
+        // FormField如果有设置name，接管子组件的双向数据流
+        if (name && store && isValidElement(child)) {
+            const childProps = { name, value, onChange };
+            child = cloneElement(child, childProps);
+        }
+    } else {
+        throw new Error('FormControl只能包裹1个控件');
     }
 
-    return (
-        <div className={styles['ui-form-item']}>
-            {label !== undefined && (
-                <label className={styles['ui-label']}>{label}</label>
-            )}
-            <div className={styles['ui-form-item-box']}>{child}</div>
-        </div>
-    );
+    return <>{child}</>;
 }
-export default FormField;
+export default FormControl;
