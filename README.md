@@ -2,9 +2,8 @@
 
 ## 初始化
 
-import { Form, FormControl, FormItem, FormStore } from './form';
-
 ```tsx
+import { Form, FormControl, FormItem, FormStore } from './form';
 export default class FormDemo extends Component<any, IState> {
     private formStore;
     constructor(props: any) {
@@ -44,6 +43,7 @@ export default class FormDemo extends Component<any, IState> {
 ### FormItem
 
 表单项组件，用于布局
+
 当 FormItem 设置了`name`属性且只有一个子组件时，会在内部使用 FormControl 包裹子组件
 
 ### FormControl
