@@ -49,3 +49,7 @@ export default class FormDemo extends Component<any, IState> {
 ### FormControl
 
 表单控件容器，用于 formStore 接管表单域子组件双向数据流
+
+## 参考
+
+https://github.com/varHarrie/varharrie.github.io/issues/28

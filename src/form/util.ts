@@ -1,73 +1,17 @@
-export function isObject(obj: any) {
-    return obj !== null && typeof obj === 'object';
+import _ from 'lodash';
+
+export function deepGet(object: any, path: string) {
+    return _.get(object, path);
 }
 
-export function deepGet(obj: any, path: string) {
-    const parts = path.split('.');
-    const length = parts.length;
-
-    for (let i = 0; i < length; i++) {
-        if (!isObject(obj)) {
-            return undefined;
-        }
-        const key = parts[i];
-        obj = obj[key];
-    }
-
-    return obj;
+export function deepSet(object: any, path: string, value: any) {
+    return _.set(object, path, value);
 }
 
-export function deepSet(obj: any, path: string, value: any) {
-    if (!isObject(obj)) return obj;
-
-    const root = obj;
-    const parts = path.split('.');
-    const length = parts.length;
-
-    for (let i = 0; i < length; i++) {
-        const p = parts[i];
-
-        if (i === length - 1) {
-            obj[p] = value;
-        } else if (!isObject(obj[p])) {
-            obj[p] = {};
-        }
-
-        obj = obj[p];
-    }
-
-    return root;
+export function deepClone<T>(object: T) {
+    return _.cloneDeep(object);
 }
 
-export function deepCopy<T>(target: T): T {
-    const type = typeof target;
-
-    if (
-        target === null ||
-        type === 'boolean' ||
-        type === 'number' ||
-        type === 'string'
-    ) {
-        return target;
-    }
-
-    if (target instanceof Date) {
-        return new Date(target.getTime()) as any;
-    }
-
-    if (Array.isArray(target)) {
-        return target.map((o) => deepCopy(o)) as any;
-    }
-
-    if (typeof target === 'object') {
-        const obj: any = {};
-
-        for (let key in target) {
-            obj[key] = deepCopy(target[key]);
-        }
-
-        return obj;
-    }
-
-    return undefined as any;
+export function deepRemove(object: any, path: string) {
+    return _.unset(object, path);
 }
