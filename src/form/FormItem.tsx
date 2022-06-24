@@ -8,6 +8,7 @@ interface FormFieldProps {
     name?: string;
     children?: React.ReactNode;
     onChange?: (value: string) => void;
+    shouldUpdate?: (prevValues: any, curValues: any) => boolean;
 }
 
 function FormItem(props: FormFieldProps) {

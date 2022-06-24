@@ -3,7 +3,7 @@ import React, {
     isValidElement,
     useCallback,
     useContext,
-    useEffect,
+    useLayoutEffect,
     useState,
 } from 'react';
 import FormStoreContext from './FormStoreContext';
@@ -12,11 +12,16 @@ interface FormControlProps {
     name?: string;
     children?: React.ReactNode;
     onChange?: (value: string) => void;
+    shouldUpdate?: boolean | ((prevValues: any, curValues: any) => boolean);
 }
 
 function FormControl(props: FormControlProps) {
-    const { name, children, onChange: onFieldChange } = props;
+    const [updateCount, setUpdateCount] = useState(0);
+
+    const { name, children, onChange: onFieldChange, shouldUpdate } = props;
     const store = useContext(FormStoreContext);
+
+    console.log('FormControl', name, 'rendering');
 
     // 组件内部状态，用于触发组件的重新渲染
     const [value, setValue] = useState(
@@ -34,16 +39,37 @@ function FormControl(props: FormControlProps) {
     );
 
     // 订阅表单数据变动
-    useEffect(() => {
+    useLayoutEffect(() => {
         if (!name || !store) return;
-        return store.subscribe((n) => {
-            // 当前name的数据发生了变动，获取数据并重新渲染
-            if (n === name || n === '*') {
-                const newValue = store.get(name);
-                setValue(newValue);
+        console.log('formControl', name, '开始订阅formStore变动');
+        const unsubscribe = store.subscribe(
+            name,
+            (fieldName, prevValues, curValues) => {
+                // 当前name的数据发生了变动，获取数据并重新渲染
+                if (fieldName === name || fieldName === '*') {
+                    console.log(
+                        'formControl',
+                        name,
+                        '的数据发生了变动，获取数据并重新渲染'
+                    );
+                    const newValue = store.get(name);
+                    setValue(newValue);
+                }
+                if (
+                    (typeof shouldUpdate == 'boolean' && shouldUpdate) ||
+                    (typeof shouldUpdate === 'function' &&
+                        shouldUpdate(prevValues, curValues))
+                ) {
+                    console.log('强制刷新当前控件:', name);
+                    setUpdateCount((updateCount) => updateCount + 1);
+                }
             }
-        });
-    }, [name, store]);
+        );
+        return () => {
+            console.log(name, 'unmounted');
+            unsubscribe();
+        };
+    }, []);
 
     let child = children;
 
