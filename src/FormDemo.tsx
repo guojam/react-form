@@ -1,4 +1,4 @@
-import React, { Component, FormEvent } from 'react';
+import React, { createRef, Component, FormEvent } from 'react';
 import { Form, FormControl, FormItem, FormStore } from './form';
 import Input from './components/input';
 import { Radio, RadioGroup } from './components/radio';
@@ -8,16 +8,9 @@ interface IState {
 }
 
 export default class FormDemo extends Component<any, IState> {
-    private formStore;
+    private formRef = createRef<FormStore>();
     constructor(props: any) {
         super(props);
-        // this.formStore = new FormStore({
-        //     username: [''],
-        //     password: [''],
-        //     gender: ['female'],
-        //     enableNickname: ['false'],
-        // });
-        this.formStore = new FormStore();
         this.state = {
             showNicknameInput: false,
         };
@@ -25,13 +18,7 @@ export default class FormDemo extends Component<any, IState> {
 
     componentDidMount() {
         console.log('formDemo componentDidMount, 设置表单初始值');
-        // this.formStore.set({
-        //     username: '',
-        //     password: '',
-        //     gender: 'female',
-        //     enableNickname: 'false',
-        // });
-        this.formStore.group({
+        this.formRef.current?.group({
             username: [''],
             password: [''],
             gender: ['female'],
@@ -40,15 +27,15 @@ export default class FormDemo extends Component<any, IState> {
     }
     componentWillUnmount() {
         console.log('formDemo componentWillUnmount');
-        console.log(this.formStore.get());
+        console.log(this.formRef.current?.get());
     }
     handleSubmit = (e: FormEvent) => {
-        const formValues = this.formStore.get();
+        const formValues = this.formRef.current?.get();
         console.log('formValues:', formValues);
         e.preventDefault();
     };
     handleReset = () => {
-        this.formStore.reset();
+        this.formRef.current?.reset();
     };
     handleChange = (fieldName: string) => {
         return (value: string) => {
@@ -60,9 +47,9 @@ export default class FormDemo extends Component<any, IState> {
         console.log('enableNicknameHandleChange', value);
         const showNicknameInput = value === 'true';
         if (showNicknameInput) {
-            this.formStore.set('nickname', '');
+            this.formRef.current?.set('nickname', '');
         } else {
-            this.formStore.remove('nickname');
+            this.formRef.current?.remove('nickname');
         }
         this.setState({ showNicknameInput });
     };
@@ -70,7 +57,7 @@ export default class FormDemo extends Component<any, IState> {
         console.log('form demo rending...');
         return (
             <>
-                <Form store={this.formStore} onSubmit={this.handleSubmit}>
+                <Form ref={this.formRef} onSubmit={this.handleSubmit}>
                     <FormItem
                         name="username"
                         label="用户名"
