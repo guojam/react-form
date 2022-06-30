@@ -1,45 +1,5 @@
 # React Form
 
-## 初始化
-
-```tsx
-import { Form, FormControl, FormItem, FormStore } from './form';
-export default class FormDemo extends Component<any, IState> {
-    private formStore;
-    constructor(props: any) {
-        super(props);
-        this.formStore = new FormStore({
-            username: [''],
-            password: [''],
-        });
-    }
-    handleSubmit = (e: FormEvent) => {
-        const formValues = this.formStore.get();
-        e.preventDefault();
-    };
-    handleReset = () => {
-        this.formStore.reset();
-    };
-    usernameHandleChange = (value: string) => {};
-    render() {
-        return (
-            <Form store={this.formStore} onSubmit={this.handleSubmit}>
-                <FormItem
-                    name="username"
-                    label="用户名"
-                    onChange={this.usernameHandleChange}
-                >
-                    <Input />
-                </FormItem>
-                <FormItem name="password" label="密码">
-                    <Input type="password" />
-                </FormItem>
-            </Form>
-        );
-    }
-}
-```
-
 ### FormItem
 
 表单项组件，用于布局
@@ -52,4 +12,6 @@ export default class FormDemo extends Component<any, IState> {
 
 ## 参考
 
-https://github.com/varHarrie/varharrie.github.io/issues/28
+[React 表单 Form 组件的设计与实现](https://github.com/varHarrie/varharrie.github.io/issues/28)
+
+[手写实现 rc-field-form](https://juejin.cn/post/7066977887605227551)

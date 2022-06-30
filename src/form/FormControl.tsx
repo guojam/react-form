@@ -7,6 +7,7 @@ import React, {
     useState,
 } from 'react';
 import FormStoreContext from './FormStoreContext';
+import { deepGet } from './util';
 
 interface FormControlProps {
     name?: string;
@@ -17,22 +18,18 @@ interface FormControlProps {
 
 function FormControl(props: FormControlProps) {
     const [updateCount, setUpdateCount] = useState(0);
-
     const { name, children, onChange: onFieldChange, shouldUpdate } = props;
     const store = useContext(FormStoreContext);
 
-    console.log('FormControl', name, 'rendering');
-
     // 组件内部状态，用于触发组件的重新渲染
     const [value, setValue] = useState(
-        name && store ? store.get(name) : undefined
+        name && store ? store.getValue(name) : undefined
     );
 
     // 表单组件onChange事件，用于从事件中取得表单值
     const onChange = useCallback(
         (newValue: string) => {
-            name && store && store.set(name, newValue);
-            console.log('field', name, 'changed:', newValue);
+            name && store && store.setValue(name, newValue);
             onFieldChange && onFieldChange(newValue);
         },
         [name, store, onFieldChange]
@@ -41,19 +38,12 @@ function FormControl(props: FormControlProps) {
     // 订阅表单数据变动
     useLayoutEffect(() => {
         if (!name || !store) return;
-        console.log('formControl', name, '开始订阅formStore变动');
         const unsubscribe = store.subscribe(
             name,
             (fieldName, prevValues, curValues) => {
                 // 当前name的数据发生了变动，获取数据并重新渲染
                 if (fieldName === name || fieldName === '*') {
-                    console.log(
-                        'formControl',
-                        name,
-                        '的数据发生了变动，获取数据并重新渲染'
-                    );
-                    const newValue = store.get(name);
-                    setValue(newValue);
+                    setValue(deepGet(curValues, name));
                 }
                 if (
                     (typeof shouldUpdate == 'boolean' && shouldUpdate) ||
@@ -66,7 +56,6 @@ function FormControl(props: FormControlProps) {
             }
         );
         return () => {
-            console.log(name, 'unmounted');
             unsubscribe();
         };
     }, []);

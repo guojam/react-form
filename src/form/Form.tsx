@@ -2,25 +2,31 @@ import React, { forwardRef } from 'react';
 import FormStore from './FormStore';
 import FormStoreContext from './FormStoreContext';
 import useForm from './useForm';
+import { onValuesChangeCallback } from './model';
 
 interface FormProps {
     store?: FormStore;
     className?: string;
     children?: React.ReactNode;
     onSubmit?: (e: React.FormEvent) => void;
+    onValuesChange?: onValuesChangeCallback;
 }
 
 /**
  * @param ref 第二个参数 ref 只在使用 React.forwardRef 定义组件时存在。常规函数和 class 组件不接收 ref 参数，且 props 中也不存在 ref。
  */
 function _Form(props: FormProps, ref: React.Ref<FormStore>) {
-    const { children, onSubmit, store } = props;
+    const { children, onSubmit, store, onValuesChange } = props;
     // 函数式组件通过useForm获取formStore
     const [formStore] = useForm(store);
 
     // class组件通过ref转发获取formStore
     // https://zh-hans.reactjs.org/docs/forwarding-refs.html
     React.useImperativeHandle(ref, () => formStore);
+
+    /** 收集回调方法 */
+    formStore.setCallbacks({ onValuesChange });
+
     return (
         <FormStoreContext.Provider value={formStore}>
             <form onSubmit={onSubmit}>{children}</form>

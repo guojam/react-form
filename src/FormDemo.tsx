@@ -27,10 +27,10 @@ export default class FormDemo extends Component<any, IState> {
     }
     componentWillUnmount() {
         console.log('formDemo componentWillUnmount');
-        console.log(this.formRef.current?.get());
+        console.log(this.formRef.current?.getValue());
     }
     handleSubmit = (e: FormEvent) => {
-        const formValues = this.formRef.current?.get();
+        const formValues = this.formRef.current?.getValue();
         console.log('formValues:', formValues);
         e.preventDefault();
     };
@@ -43,11 +43,19 @@ export default class FormDemo extends Component<any, IState> {
         };
     };
 
+    handleValuesChange = (changedValues: any, allValues: any) => {
+        console.log('handleValuesChange');
+        console.log('changedValues');
+        console.log(changedValues);
+        console.log('allValues');
+        console.log(allValues);
+    };
+
     enableNicknameHandleChange = (value: string) => {
         console.log('enableNicknameHandleChange', value);
         const showNicknameInput = value === 'true';
         if (showNicknameInput) {
-            this.formRef.current?.set('nickname', '');
+            this.formRef.current?.setValue('nickname', '');
         } else {
             this.formRef.current?.remove('nickname');
         }
@@ -57,7 +65,11 @@ export default class FormDemo extends Component<any, IState> {
         console.log('form demo rending...');
         return (
             <>
-                <Form ref={this.formRef} onSubmit={this.handleSubmit}>
+                <Form
+                    ref={this.formRef}
+                    onSubmit={this.handleSubmit}
+                    onValuesChange={this.handleValuesChange}
+                >
                     <FormItem
                         name="username"
                         label="用户名"
@@ -104,12 +116,11 @@ export default class FormDemo extends Component<any, IState> {
                         <FormItem
                             label="昵称"
                             name="nickname"
-                            shouldUpdate={(prevValues, curValues) => {
-                                console.log(1);
-                                console.log(prevValues);
-                                console.log(curValues);
-                                return true;
-                            }}
+                            // shouldUpdate={(prevValues, curValues) => {
+                            //     console.log(prevValues);
+                            //     console.log(curValues);
+                            //     return true;
+                            // }}
                         >
                             <Input />
                         </FormItem>

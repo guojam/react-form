@@ -1,38 +1,74 @@
-import { FormListener } from './form.model';
-import { deepClone, deepGet, deepSet, deepRemove } from './util';
-
-// tuple 元组
-type FieldConfig = [string | FormControlsConfig];
-interface FormControlsConfig {
-    [key: string]: FieldConfig;
-}
-interface FormValues {
-    [key: string]: string | FormValues;
-}
+import {
+    FormControlsConfig,
+    FormListener,
+    FormStoreCallbacks,
+    FormValues,
+} from './model';
+import {
+    deepClone,
+    deepCompare,
+    deepGet,
+    deepRemove,
+    deepSet,
+    getDeepDiff,
+} from './util';
 
 export default class FormStore {
     /** 表单初始值，用于重置表单 */
-    private initialValues: any;
-    private values: any;
+    private initialValues: FormValues = {};
+    /** 表单修改之前的值 */
+    private prevValues: FormValues = {};
+    /** 表单当前值 */
+    private values: FormValues = {};
+    private callbacks: FormStoreCallbacks = {};
 
-    /** 事件回调 */
+    /** 事件监听器 */
     private listeners: FormListener[] = [];
     constructor(controlsConfig?: FormControlsConfig) {
         // 表单初始值，用于重置表单
-        this.initialValues = this.getInitialValues(controlsConfig);
-        this.values = deepClone(this.initialValues);
+        controlsConfig && this.group(controlsConfig);
+    }
+
+    group(config: FormControlsConfig) {
+        const values = this.getInitialValues(config);
+        this.initialValues = values;
+        this.values = deepClone(values);
+        // 通知所有组件变动信息
+        this.notify('*');
     }
 
     /** 通知表单变动 */
-    private notify(name: string, prevValues: any, curValues: any) {
+    private notify(fieldName: string) {
+        if (fieldName === '*') {
+            console.log(
+                'notify : set all fields',
+                this.prevValues,
+                '--->',
+                this.values
+            );
+        } else {
+            console.log(
+                'notify : set field',
+                fieldName,
+                deepGet(this.prevValues, fieldName),
+                '--->',
+                deepGet(this.values, fieldName)
+            );
+        }
+
+        const prevValues = deepClone(this.prevValues),
+            curValues = deepClone(this.values);
         this.listeners.forEach((listener) =>
-            listener(name, prevValues, curValues)
+            listener(fieldName, prevValues, curValues)
         );
+
+        const { onValuesChange } = this.callbacks;
+        const changedValues = getDeepDiff(curValues, prevValues);
+        onValuesChange && onValuesChange(changedValues, curValues);
     }
 
     private getInitialValues(config?: FormControlsConfig) {
-        const formValue = {} as FormValues;
-
+        const formValue: FormValues = {};
         config &&
             Object.keys(config).forEach((key) => {
                 const fieldConfig = config[key],
@@ -48,63 +84,62 @@ export default class FormStore {
         return formValue;
     }
 
-    private getFieldValue(formValues: any, name: string) {
-        return deepGet(formValues, name);
+    setCallbacks(callbacks: FormStoreCallbacks) {
+        this.callbacks = callbacks;
     }
 
-    subscribe(name: string, listener: FormListener) {
+    subscribe(fieldName: string, listener: FormListener) {
         this.listeners.push(listener);
         // 返回取消订阅方法
         return () => {
-            console.log('取消订阅', name);
+            console.log('取消订阅', fieldName);
             // 移除事件监听器
             const index = this.listeners.indexOf(listener);
             if (index > -1) {
                 this.listeners.splice(index, 1);
             }
             // 从表单域中移除该对象
-            this.remove(name);
+            this.remove(fieldName);
         };
     }
 
-    group(config: FormControlsConfig) {
-        const values = this.getInitialValues(config);
-        this.initialValues = values;
-        this.set(deepClone(values));
-    }
-
-    get(name?: string) {
+    getValue(fieldName?: string) {
         // 如果传入name，返回对应的表单值，否则返回整个表单的值
-        return name
-            ? this.getFieldValue(this.values, name)
-            : { ...this.values };
+        return fieldName
+            ? deepGet(this.values, fieldName)
+            : deepClone(this.values);
     }
 
     /** 设置、增加表单项 */
-    set(name: any, value?: any): void {
-        const prevValues = deepClone(this.values);
-        if (typeof name === 'string') {
-            deepSet(this.values, name, value);
-            this.notify(name, prevValues, this.values);
-        } else if (name) {
-            const values = name;
+    setValue(fieldName: any, value?: any): void {
+        if (typeof fieldName === 'string') {
+            const prevValue = deepGet(this.values, fieldName);
+            if (!deepCompare(prevValue, value)) {
+                // 值有改变才设置
+                this.setFieldValue(fieldName, value);
+            }
+        } else if (fieldName) {
+            const values = fieldName;
             // 批量设置表单值
-            Object.keys(values).forEach((key) => this.set(key, values[key]));
+            Object.keys(values).forEach((key) =>
+                this.setValue(key, values[key])
+            );
         }
     }
 
     /** 移除表单项 */
-    remove(name: string) {
-        console.log('remove field', name);
-        return deepRemove(this.values, name);
+    remove(fieldName: string) {
+        console.log('remove field', fieldName);
+        return deepRemove(this.values, fieldName);
     }
 
-    // 重置表单值
     reset() {
-        const prevValues = deepClone(this.values);
-        // 重置默认值
-        this.values = deepClone(this.initialValues);
-        // 执行通知
-        this.notify('*', prevValues, this.values);
+        this.setValue(this.initialValues);
+    }
+
+    private setFieldValue(fieldName: string, value: FormValues) {
+        this.prevValues = deepClone(this.values);
+        deepSet(this.values, fieldName, value);
+        this.notify(fieldName);
     }
 }

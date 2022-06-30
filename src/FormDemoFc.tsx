@@ -1,5 +1,5 @@
 import React, { FormEvent, useEffect, useState } from 'react';
-import { Form, FormControl, FormItem, useForm } from './form';
+import { Form, FormControl, FormItem, useForm, FormValues } from './form';
 import Input from './components/input';
 import { Radio, RadioGroup } from './components/radio';
 
@@ -16,7 +16,7 @@ const FormDemoFc = () => {
     }, [formStore]);
 
     const handleSubmit = (e: FormEvent) => {
-        const formValues = formStore.get();
+        const formValues = formStore.getValue();
         console.log('formValues:', formValues);
         e.preventDefault();
     };
@@ -33,16 +33,26 @@ const FormDemoFc = () => {
         console.log('enableNicknameHandleChange', value);
         const showNicknameInput = value === 'true';
         if (showNicknameInput) {
-            formStore.set('nickname', '');
+            formStore.setValue('nickname', '');
         } else {
             formStore.remove('nickname');
         }
         setShowNicknameInput(showNicknameInput);
     };
 
+    const handleValuesChange = ({ enableNickname }: FormValues) => {
+        if (enableNickname !== undefined) {
+            setShowNicknameInput(enableNickname === 'true');
+        }
+    };
+
     return (
         <>
-            <Form store={formStore} onSubmit={handleSubmit}>
+            <Form
+                store={formStore}
+                onSubmit={handleSubmit}
+                onValuesChange={handleValuesChange}
+            >
                 <FormItem
                     name="username"
                     label="用户名"
@@ -69,7 +79,7 @@ const FormDemoFc = () => {
                 <FormItem label="显示昵称">
                     <FormControl
                         name="enableNickname"
-                        onChange={enableNicknameHandleChange}
+                        // onChange={enableNicknameHandleChange}
                     >
                         <RadioGroup>
                             <Radio value="false">不显示</Radio>
@@ -89,12 +99,11 @@ const FormDemoFc = () => {
                     <FormItem
                         label="昵称"
                         name="nickname"
-                        shouldUpdate={(prevValues, curValues) => {
-                            console.log(1);
-                            console.log(prevValues);
-                            console.log(curValues);
-                            return true;
-                        }}
+                        // shouldUpdate={(prevValues, curValues) => {
+                        //     console.log(prevValues);
+                        //     console.log(curValues);
+                        //     return true;
+                        // }}
                     >
                         <Input />
                     </FormItem>
