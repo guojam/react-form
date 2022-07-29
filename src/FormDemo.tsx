@@ -1,5 +1,5 @@
 import React, { createRef, Component, FormEvent } from 'react';
-import { Form, FormControl, FormItem, FormStore } from './form';
+import { Form, FormField, FormItem, FormStore } from './form';
 import Input from './components/input';
 import { Radio, RadioGroup } from './components/radio';
 
@@ -94,7 +94,7 @@ export default class FormDemo extends Component<any, IState> {
                         </RadioGroup>
                     </FormItem>
                     <FormItem label="显示昵称">
-                        <FormControl
+                        <FormField
                             name="enableNickname"
                             onChange={this.enableNicknameHandleChange}
                         >
@@ -102,7 +102,7 @@ export default class FormDemo extends Component<any, IState> {
                                 <Radio value="false">不显示</Radio>
                                 <Radio value="true">显示</Radio>
                             </RadioGroup>
-                        </FormControl>
+                        </FormField>
                         <p
                             style={{
                                 fontSize: '12px',
