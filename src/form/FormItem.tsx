@@ -1,6 +1,6 @@
 import React, { isValidElement } from 'react';
 
-import FormControl from './FormControl';
+import FormField from './FormField';
 import styles from './form.module.scss';
 
 interface FormFieldProps {
@@ -16,11 +16,11 @@ function FormItem(props: FormFieldProps) {
 
     let child = children;
     if (name && React.Children.count(child) === 1 && isValidElement(child)) {
-        // FormField如果有设置name，且只有一个子组件，用FormControl包裹子组件
+        // FormItem如果有设置name，且只有一个子组件，用FormField包裹子组件
         child = (
-            <FormControl name={name} {...rest}>
+            <FormField name={name} {...rest}>
                 {children}
-            </FormControl>
+            </FormField>
         );
     }
 

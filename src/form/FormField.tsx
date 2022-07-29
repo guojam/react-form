@@ -9,14 +9,14 @@ import React, {
 import FormStoreContext from './FormStoreContext';
 import { deepGet } from './util';
 
-interface FormControlProps {
+interface FormFieldProps {
     name?: string;
     children?: React.ReactNode;
     onChange?: (value: string) => void;
     shouldUpdate?: boolean | ((prevValues: any, curValues: any) => boolean);
 }
 
-function FormControl(props: FormControlProps) {
+function FormField(props: FormFieldProps) {
     const [updateCount, setUpdateCount] = useState(0);
     const { name, children, onChange: onFieldChange, shouldUpdate } = props;
     const store = useContext(FormStoreContext);
@@ -70,9 +70,9 @@ function FormControl(props: FormControlProps) {
             child = cloneElement(child, childProps);
         }
     } else {
-        throw new Error('FormControl只能包裹1个控件');
+        throw new Error('FormField只能包裹1个控件');
     }
 
     return <>{child}</>;
 }
-export default FormControl;
+export default FormField;
